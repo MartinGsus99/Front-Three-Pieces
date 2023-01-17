@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+
+</head>
+
+<body>
+    <div id="mountNode"></div>
+
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+    <script>
+        const data = {
+            // 点集
+            nodes: [
+                {
+                    id: 'node0',          // 元素的 id
+                    type: 'circle',       // 元素的图形
+                    size: 20,
+                    class: 'c1',           // 元素的大小
+                    label: 'D',        // 标签文字
+                    visible: true,        // 控制初次渲染显示与隐藏，若为 false，代表隐藏。默认不隐藏
+                    labelCfg: {           // 标签配置属性
+                        positions: 'center',// 标签的属性，标签在元素中的位置
+                        style: {            // 包裹标签样式属性的字段 style 与标签其他属性在数据结构上并行
+                            fontSize: 12      // 标签的样式属性，文字字体大小
+                            // ...            // 标签的其他样式属性
+                        }
+                    },
+                    // ...,               // 其他属性
+                    style: {              // 包裹样式属性的字段 style 与其他属性在数据结构上并行
+                        fill: '#fff',       // 样式属性，元素的填充色
+                        stroke: '#888',     // 样式属性，元素的描边色
+                        // ...              // 其他样式属性
+                    }
+                },
+                {
+                    id: 'node1', // String，该节点存在则必须，节点的唯一标识
+                    x: 100, // Number，可选，节点位置的 x 值
+                    y: 200, // Number，可选，节点位置的 y 值
+                    label: 'A',
+                    class: 'c1',
+                },
+                {
+                    id: 'node2', // String，该节点存在则必须，节点的唯一标识
+                    x: 300, // Number，可选，节点位置的 x 值
+                    y: 200, // Number，可选，节点位置的 y 值
+                    label: 'B',
+                    class: 'c2',
+                },
+                {
+                    id: 'node3', // String，该节点存在则必须，节点的唯一标识
+                    x: 400, // Number，可选，节点位置的 x 值
+                    y: 500, // Number，可选，节点位置的 y 值
+                    label: 'C',
+                    class: 'c2',
+                },
+            ],
+            // 边集
+            edges: [
+                {
+                    source: 'node1', // String，必须，起始点 id
+                    target: 'node2', // String，必须，目标点 id
+                    label: '属于',
+                    weight: 5
+                },
+                {
+                    source: 'node1', // String，必须，起始点 id
+                    target: 'node3', // String，必须，目标点 id
+                    label: '属于',
+                    weight: 3
+                },
+                {
+                    source: 'node2',
+                    target: 'node3',
+                    label: '属于',
+                    weight: 10
+                }
+            ],
+        };
+
+        const nodes = data.nodes;
+        nodes.forEach((node) => {
+            if (!node.style) {
+                node.style = {};
+            }
+            switch (node.class) {
+                case 'c1': {
+                    node.type = 'circle';
+
+                    break;
+                }
+                case 'c2': {
+                    node.type = 'rect';
+                    node.size = [35, 20]; // class = 'c2' 时节点大小
+                    break;
+                }
+            }
+        })
+
+        // const edges=data.edges;
+        // edges.forEach((edge)=>{
+        //     if(!edge.style){
+        //         edge.style={}
+        //     }
+        //     edge.style.lineWidth=edge.weight;
+        // });
+
+        const minimap = new G6.Minimap({
+            size: [100, 100],
+            className: 'minimap',
+            type: 'delegate',
+        });
+
+        // 实例化 Image Minimap 插件
+        const imageMinimap = new G6.ImageMinimap({
+            width: 200,
+            graphImg: 'https://gw.alipayobjects.com/mdn/rms_f8c6a0/afts/img/A*eD7nT6tmYgAAAAAAAAAAAABkARQnAQ'
+        });
+
+        // 一些主画布更新操作
+        //imageMinimap.updateGraphImg(img); 
+        // 使用新的图片（用户自己生成）替换 minimap 图片
+
+
+        // 实例化 grid 插件
+        const grid = new G6.Grid();
+
+
+        const graph = new G6.Graph({
+            container: 'mountNode',
+            width: 800,
+            height: 500,
+            // fitView: true,
+            // firViewPadding: [10, 10, 10, 10],
+
+            //布局
+            layout: {
+                type: 'force',
+                preventOverlap: true,
+                linkDistance: 100, // 指定边距离为100
+            },
+
+            //mode管理
+            modes: {
+                default: ['drag-canvas', 'zoom-canvas', 'drag-node',
+                    {
+                        type: 'tooltip',
+                        formatText(model) {
+                            const text = 'label' + model.label + '<br/>class:' + model.class;
+                            return text;
+                        }
+                    },
+                    {
+                        type: 'edge-tooltip', // 边提示框
+                        formatText(model) {
+                            // 边提示框文本内容
+                            const text =
+                                'source: ' +
+                                model.source +
+                                '<br/> target: ' +
+                                model.target +
+                                '<br/> weight: ' +
+                                model.weight;
+                            return text;
+                        }
+                    },
+                ],
+                edit: []
+            },
+
+
+            //添加插件
+            plugins: [minimap, grid],
+
+
+            animate: true, // Boolean，可选，全局变化时否使用动画过渡
+
+            //state
+            nodeStateStyles: {
+                hover: {
+                    fill: 'lightsteelblue',
+                },
+                click: {
+                    stroke: "#000",
+                    lineWidth: 3,
+                }
+            },
+            edgeStateStyles: {
+                click: {
+                    stroke: 'steelblue'
+                }
+            }
+        });
+
+        graph.on('node:mouseenter', (e) => {
+            const nodeItem = e.item;
+            graph.setItemState(nodeItem, 'hover', true);
+        })
+
+        graph.on('node:mouseleave', (e) => {
+            const nodeItem = e.item;
+            graph.setItemState(nodeItem, 'hover', false);
+        })
+
+        graph.on('node:click', (e) => {
+            const clickNodes = graph.findAllByState('node', 'click');
+            clickNodes.forEach((cn) => {
+                graph.setItemState(cn, 'click', false);
+            });
+            const nodeItem = e.item;
+            graph.setItemState(nodeItem, 'click', true);
+        })
+
+        graph.on('edge:click', (e) => {
+            const clickEdges = graph.findAllByState('edge', 'click');
+            clickEdges.forEach((ce) => {
+                graph.setItemState(ce, 'click', false);
+            });
+            const edgeItem = e.item;
+            graph.setItemState(edgeItem, 'click', true);
+        })
+
+
+
+
+        graph.data(data);
+        graph.render();
+    </script>
+
+</body>
+
+</html>
+
+<style>
+    /* 提示框的样式 */
+    .g6-tooltip {
+        border: 1px solid #e2e2e2;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #545454;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px 8px;
+        box-shadow: rgb(174, 174, 174) 0px 0px 10px;
+    }
+</style>
