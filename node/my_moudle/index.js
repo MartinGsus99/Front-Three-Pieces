@@ -12,3 +12,6 @@ console.log(rateChangeEurope);
 console.log("100￥= ",rateChangeEurope.rateToBaserate(),'€.');
 console.log("100€= ",rateChangeEurope.baserateToRate(),'￥.');
 console.log("100￥= ",rateChangeUSD.rateToBaserate(),'$.');
+
+const printAge=require(printAge);
+console.log(printName("Martin."));

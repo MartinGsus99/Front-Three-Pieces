@@ -102,6 +102,122 @@ npm init -y   //全部使用默认值的package
 >
 > I/O密集的地方尽量不要使用require，所有的同步调用都会阻塞Node；
 
+### 3. node_modules重用模块
+
+> 要求模块在文件系统中使用相对路径存放，对于组织程序特定的代码很有帮助。但是对于想要在程序见共享或者跟他人共享代码却用处不大。
+>
+> Node有一个独特的模块引入机制，即node_modules,其模块检索规则如下：
+
+![](https://s3.bmp.ovh/imgs/2023/02/07/4accd465166d6500.jpg)
+
+##### 注意事项：
+
+- 如果模块是目录，在模块目录中定义模块的文件必须命名为index.js。除非在这个目录下一个叫package.json的文件特别执行。要执行一个取代index.js的文件，必须使用JSON数据定义的对象；
+
+```json
+{
+    "main":"currency.js"
+}
+```
+
+![](https://s3.bmp.ovh/imgs/2023/02/07/eb62dc14f1e8a0e5.jpg)
+
+- Node能把模块作为对象缓存起来。如果两个文件引入了相同的模块，第一个require会把模块返回的数据存到内存中。第二个引入会从内存中加载。
+
+![](https://s3.bmp.ovh/imgs/2023/02/07/3baf64653ff8e710.jpg)
+
+##### ！！！！！！不能实现
+
+### 4.异步编程
+
+Node世界的两种响应逻辑方式：
+
+- 回调：通常用来定义一次性响应的逻辑。比如数据库查询；
+- 事件监听：本质上也是一个回调，不同的是和一个概念实体有关（事件）；
+
+```js
+//下面的例子中，用EventEmitter.Prototype.on方法在服务器上绑定了一个监听器，当有request事件发出，服务器调用handleRequest函数
+
+server.on('request',handleRequest);
+```
+
+Node Http服务器实例是一个事件发射器，一个可以类（Event Emitter）；
+
+Node的很多核心功能都继承自EventEmitter；
+
+##### 用回调处理一次性事件
+
+> 回调是一个函数，被当作参数传递给异步函数，用来描述异步操作完成之后要做什么。
+
+实例如下：
+
+- 异步获取存放在json文件中的文章标题
+- 异步获取简单的HTML模板
+- 将标题组装到HTML页面里
+- 将HTML发送给客户
+
+```js
+const http=require('http');
+const fs=require('fs');
+
+http.createServer((req,res)=>{
+    getTitles(res);
+}).listen(8000,'127.0.0.1');
+
+//将回调嵌套的功能代码提取出来
+function getTitles(res){
+    fs.readFile('./data/title.json',(err,data)=>{
+        if(err) return hadError(err,res);
+        getTemplate(JSON.parse(data.toString()),res);
+    });
+}
+
+function getTemplate(titles,res){
+    fs.readFile('./index.html',(err,data)=>{
+        if(err) return hadError(err,res);
+        formatHtml(titles,data.toString(),res);
+    })
+}
+
+function formatHtml(titles,templ,res){
+    const html=templ.replace('%',titles.join('</li><li>'));
+    res.writeHead(200,{'Content-Type':'text/html'});
+    res.end(html);
+}
+
+function hadError(err,res){
+    console.log(err);
+    res.end("Server Error");
+}
+```
+
+##### 用事件发射器处理重复性事件
+
+> 事件发射器会触发事件，并且在那些事件被触发时能处理他们；
+>
+> 重要的Node API组件，比如HTTP服务器、TCP服务器和流都被做成了事件发射器；
+
+```js
+socket.on('data',handleData)
+```
+
+echo服务器的例子：
+
+```js
+const net=require('net');
+const server=net.createServer(socket=>{
+    socket.on('data',data=>{
+        socket.write("Your message is: "+data+".\n");
+    });
+});
+
+server.listen(8000,'127.0.0.1');
+```
+
+
+
+
+
 
 
 
