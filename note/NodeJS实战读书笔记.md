@@ -301,15 +301,141 @@ const server=net.createServer(client=>{
 server.listen(8888);
 ```
 
+### 5.异步开发的难题
 
+> 创建异步程序时，需要关注：
+>
+> 1.事件轮询的条件；
+>
+> 2.程序变量；
+>
+> 3.其他随程序逻辑执行而发生变化的资源；
 
+```js
+//作用域是如何导致bug出现的
 
+function  asyncFunction(callback){
+    setTimeout(callback,200);
+}
 
+let color='green';				//初始color
+asyncFunction(()=>{
+    console.log(`The color is ${color}.`);			//等待200ms输出color
+});
 
+color='blue'			//结果为输出blue；
+```
 
+> JS闭包可以冻结color的值；
+>
+> 下面的例子对asyncFunction的调用被封装到一个以color为参数的匿名函数里。
 
+```js
+color='blue'			
+(color=>{
+    asyncFunction(()=>{
+        console.log(`The color is `,color);
+    });
+})(color);
 
+color='green';				//结果为输出blue；
+```
 
+### 6.异步逻辑的顺序化
+
+> 让一组异步任务顺序执行的概念被Node社区称为流程控制；
+>
+> 控制分为：串行、并行
+
+![](https://s3.bmp.ovh/imgs/2023/02/09/b33ca1d4d596f929.jpg)
+
+#### （1）串行流程控制
+
+```js
+//以下代码用回调让任务顺序执行
+setTimeout(()=>{
+    console.log("Wait 1000ms...");
+    setTimeout(()=>{
+        console.log("Wait 500ms...");
+        setTimeout(()=>{
+            console.log("Wait 100ms...");
+        },100)
+    },500)
+},1000)
+```
+
+实际情况中可能是读取文件、发送http请求等；
+
+##### 借助async流程控制工具执行
+
+```shell
+npm install async
+```
+
+```js
+const async=require('async');
+
+//维护一个顺序数组
+async.series([
+    callback=>{
+        setTimeout(()=>{
+            console.log("Wawit 1000ms...");
+            callback();
+        },1000);
+    },
+    callback=>{
+        setTimeout(()=>{
+            console.log("Wawit 500ms...");
+            callback();
+        },500)
+    },
+    callback=>{
+        setTimeout(()=>{
+            console.log("Wawit 100ms...");
+            callback();
+        },100);
+    }
+]);
+```
+
+- 可读性、可维护性更强；
+- 刻意回避回调嵌套；
+
+#### （2）实现串行化流程控制
+
+- 按照预期执行的顺序维护一个数组；
+- FIFO方法完成任务；
+- 每个任务完成以后调用一个函数来返回任务执行的成功与否；
+
+```js
+function TaskA(){
+    console.log("Doing work A!");
+    next();
+}
+
+function TaskB(){
+    console.log("Doing work B!");
+    next();
+}
+
+function TaskC(){
+    console.log("Doing work C!");
+    next();
+}
+
+//维护的一个数组；
+const tasks=[TaskA,TaskB,TaskC];
+
+function next(err,result){
+    if(err) throw err;				   //如果出错，就抛出错误
+    const currentTask=tasks.shift();	//没有出错，移动数组；
+    if(currentTask){
+       currentTask(result);
+    }
+}
+
+next();
+```
 
 
 
