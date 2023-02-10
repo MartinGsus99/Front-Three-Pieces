@@ -437,6 +437,110 @@ function next(err,result){
 next();
 ```
 
+#### （3）实现并行化流程控制
+
+> 为了让异步任务并行执行，人需要维护一个数组；但是此时任务的存放顺序无关紧要；
+
+#### （4）利用社区的工具进行流程控制
+
+- Async
+- Step
+- Seq
+
+## 三、Node Web
+
+- 创建一个新的Web程序
+- 搭建RESTful服务
+- 持久化数据
+- 使用模板
+
+### 1.Node Web程序结构
+
+- package.json  包含依赖项列表和运行这个程序的命令的文件；
+- public/             静态资源文件夹，css/客户端js都在这；
+- node_modules/ 项目的依赖项会安装到这里；
+
+##### 程序代码
+
+- app.js/index.js          设置程序的代码；
+- models/                    数据库模型；
+- views/                       用来渲染的页面模板；
+- controllers/routes      HTTP请求处理器；
+- middleware/              中间件组件；
+
+> 如何组织程序是我的自由，大部分web框架都很灵活；
+
+```shell
+npm install --save express
+npm rm express --save
+```
+
+一个简单的服务器，使用express（）创建一个程序实例，添加路由处理器，然后将实例绑定到一个TCP端口；
+
+```js
+const express=require('express');
+
+const app=express();
+
+const port=process.env.PORT || 3000;
+
+app.get('/',(req,res)=>{
+    res.send("Hello,world!");
+});
+
+app.listen(port,()=>{
+    console.log(`Express web app available at localhost:${port}`);
+})
+```
+
+##### npm脚本
+
+> 启动服务起的命令（`node index.js`）可以保存问npm脚本；如下可以使用`npm start`启动项目；
+
+```json
+ "scripts": {
+    "start":"node index.js"
+  },
+```
+
+##### 搭建一个RESTful Web服务
+
+- POST  /articles   
+- GET    /articles/:id
+- GET    /articles
+- DELETE  /articles/:id
+
+```shell
+curl http://127.0.0.1:3000/articles/0
+curl -X DELETE http://127.0.0.1:3000/articles/0
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
