@@ -3,13 +3,17 @@ const bodyParser=require('body-parser');
 
 const articles=[{title:'NodeJS入门'},{title:'VueJS入门'},{title:'深入浅出VueJS'}];
 
+
 const app=express();
 
 app.set('port',process.env.PORT||3000);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
-
+app.use(
+    '/css/bootstrap.css',
+    express.static('node_modules/bootstrap/dist/css/bootstrap.css')
+  );
 
 app.get('/articles',(req,res,next)=>{
     res.send(articles);
