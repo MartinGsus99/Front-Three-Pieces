@@ -146,13 +146,101 @@ globalPerson = null;
 
 ```
 
+### 4.引用类型
+
+- 使用对象
+- 创建、操作数组
+- 理解基本的JS类型
+- 使用基本类型和基本包装类型
+
+> 引用类型的值（对象）是引用类型的一个实例；
+
+- ##### Object类型
+
+```js
+//创建Object实例
+//1.new操作符后跟Object构造函数
+var person=new Object();
+person.name="Martin";
+person.age=29;
+
+//2.对象字面量表示法
+var person={
+    name:"Martin",
+    age:29,
+    "address":"江苏省东南大学"			//属性名可以使用字符串，最后一个属性后不加逗号，会在早的版本导致错误
+}
 
 
+```
 
+- ##### Array类型
 
+```js
+//ES的数组每一项可以保存不同类型的数据；大小动态调整；
 
+//创建方式
+//1.Array构造函数；
+var colors=new Array(20);
+var colors=new Array("red","blue","yellow");
+//也可以省略new
+var colors=Array(3);
 
+//2.数组字面量表示法 
+var colors=["red","blue","yellow"];
 
+var nums=[1,2,]		//不要这样！！！
+var options=[，，，] //不要这样；
+
+//添加元素
+color[color.length]="black";
+
+//检测数组instanceof 问题在于如果存在两个不同的Array构造函数，会出错；
+if(value instanceof Array){
+    ...
+}
+    
+//更好的方法
+if(Array.isArray(value)){
+    ...
+}
+```
+
+```js
+//转换方法
+var colors = ["red", "blue", "green"]; // 创建一个包含 3 个字符串的数组
+alert(colors.toString()); // red,blue,green 
+alert(colors.valueOf()); // red,blue,green 
+alert(colors); // red,blue,green。由于 alert()要接收字符串参数，所以它会在后台调用 toString()方法，由此会得到与直接调用 toString()方法相同的结果
+
+//栈方法
+array.push();		//尾部压入
+array.pop();		//尾部弹出
+
+//队列方法
+array.push();		//尾部入队
+array.shift();		//首部出队
+array.unshift();	//首部入队
+
+//重排序方法
+array.sort();		//升序排列，方法会调用每个数组项的 toString()转型方法，然后比较得到的字符串
+array.reverse();	//反转数组
+
+//sort方法可以接受一个比较函数
+function compare(value1, value2) { 
+ if (value1 < value2) { 
+ return 1; 
+ } else if (value1 > value2) { 
+ return -1; 
+ } else { 
+ return 0; 
+ } 
+} 
+var values = [0, 1, 5, 10, 15]; 
+values.sort(compare); 
+alert(values); // 15,10,5,1,0
+
+```
 
 
 
