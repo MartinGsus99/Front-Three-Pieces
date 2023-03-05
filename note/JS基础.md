@@ -242,6 +242,75 @@ alert(values); // 15,10,5,1,0
 
 ```
 
+```js
+//操作方法
+//concat（）方法基于当前数组项创建一个新的数组；
+var colors=["red","yellow"];
+var colors2=colors.concat("green",["blue","grey"]);
+
+//slice（）方法接受一或者两个参数，为岂止位置；
+//slice方法不会影响原始数组；
+var colors = ["red", "green", "blue", "yellow", "purple"]; 
+var colors2 = colors.slice(1); 
+var colors3 = colors.slice(1,4); 
+
+//splice()方法
+splice(0,2);  //删除前两项
+splice(2,0,"red","green")  //从位置2开始插入red,green;
+splice(2,1,"red")			//替换第二项为red；
+```
+
+```js
+//位置方法
+indexOf()			//从头开始查找
+lastIndexOf()		//从尾部开始查找
+
+
+```
+
+### 5.迭代方法
+
+- every():对数组中的每一项运行给定函数，如果该函数对每一项都返回 true，则返回 true。
+- some()：对数组中的每一项运行给定函数，如果该函数对任一项返回 true，则返回 true。
+- filter():对数组中的每一项运行给定函数，返回该函数会返回 true 的项组成的数组.
+- foreach():：对数组中的每一项运行给定函数。这个方法没有返回值。
+- map()：对数组中的每一项运行给定函数，返回每次函数调用的结果组成的数组。
+
+### 6.归并方法
+
+```js
+//reduce():从第一项开始遍历；
+//reduceRight():从最后一项开始遍历；
+//接受的参数：prev,next，索引，数组对象
+var values=[1,2,3,4,5];
+//第一次调用，pre=1.cur=2;第二次：pre=3(1+2的结果)，cur=3
+var sum=values.reduce(function(prev,cur,index,array)=>{
+                      return prev+cur;
+                      });
+alert(sum);				//15
+
+```
+
+### 7.正则表达式
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
