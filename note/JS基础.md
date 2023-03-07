@@ -295,23 +295,150 @@ alert(sum);				//15
 
 
 
+## 二、面向对象的程序设计
 
+- 理解对象属性
+- 理解并创建对象
+- 理解继承
 
+### 1.属性类型
 
+> ES中有两种属性：数据属性和访问器属性
 
+- 数据属性
 
+> 数据属性包含一个数据值的位置，在这个位置可以读取和写入值。
+>
+> 1. Configurable：表示是否能通过delete删除属性从而重新定义属性，能否修改属性的特性，能否把属性修改为访问器属性；默认为true；
+> 2. Enumerable：表示是否可以通过for-in循环返回属性；默认为true;
+> 3. Writable:表示能否修改属性的值；默认为true；
+> 4. Value:数据值，默认为undefined；
 
+```js
+var person={};
+Objcect.defineProperty(person."name",{
+                       configuable:false,		//一旦设置为false,就不能变回可配置的了；
+                       writable:false,
+                       value:"Martin"，
+                       });
+console.log(person.name);		//"Martin"
+person.name="Jack";				//无法修改，非严格模式下赋值会被忽略；严格模式下，抛出错误；
+```
 
+- 访问器属性
 
+> 不包含数据值，包含一对儿~~
+>
+> getter()和setter();
+>
+> 1. configurable:表示是否能通过delete删除属性从而重新定义属性，能否修改属性的特性，能否把属性修改为访问器属性；默认为true；
+> 2. Enumerable：表示是否可以通过for-in循环返回属性；默认为true;
+> 3. Get:读取属性时调用，默认undefined；
+> 4. Set:写入属性时调用，默认undefined；
 
+```js
+var book={
+    _year:2004,			//前置下划线表示只可以通过对象方法访问；
+    edition:1
+};
 
+Objcect.defineProperty(book,"year",{
+    get:function(){						//只写getter意味着不能写，写入会被忽略；严格模式报错；
+        return this._year;
+    },
+    set:function(newValue){
+        if(newValue>2004){
+            this._year=newValue;
+            this.edition+=newValue-2004;
+        }
+    }
+});
 
+//定义多个属性
+Object.defineProperties(book,{
+    _year:{
+        value:2004,
+    },
+    edition:{
+        value:1
+    },
+    year:{
+       get:function(){						//只写getter意味着不能写，写入会被忽略；严格模式报错；
+        return this._year;
+        },
+        set:function(newValue){
+            if(newValue>2004){
+                this._year=newValue;
+                this.edition+=newValue-2004;
+            }
+        }
+    }
+})
 
+```
 
+```js
+//读取属性的特性
+var year=Object.getOwnPropertyDescriptor(book,"_year");
+console.log(year.value);
+```
 
+### 2.创建对象
 
+> 工厂模式抽象了具体创建对象的过程，考虑到ES中无法创建类，开发人员就发明了一i中函数
 
+- 工厂模式
 
+```js
+function createPerson(name,age,job){
+    var o=new Objcet();
+    o.name=name;
+    o.age=age;
+    o.job=job;
+    o.sayName=function(){
+        console.log(this.name);
+    };
+    return o;
+}
+```
+
+> 工厂模式虽然解决了创建多个相似对象的问题，但是没有解决对象识别的问题，无法知道一个对象的类型；
+
+- 构造函数模式
+
+> ES中的构造函数能船舰特定类型的对象；
+>
+> 像Object和Array这样的原生构造函数，运行时会自动出现再执行环境；
+
+```js
+function Person(name,age,job){
+    this.name=name;
+    this.age=age;
+    this.job=job;
+    
+    this.sayName=function(){
+        console.log(this.name);
+    }
+}
+```
+
+除了相同部分，有如下区别：
+
+- 没有显式的创建对象；
+- 直接将属性和方法赋给了this对象；
+- 没有return；
+
+Note：构造函数使用应该使用首字母大写的开头，非构造函数小写字母开头；
+
+```js
+//要创建Person实例，需要使用new
+let newPerson=new Person("Martin",18,"Programmer");
+console.log(newPerson.constructor==Person);   //true
+console.log(newPerson instanceof Person);	//true
+```
+
+> 创建自定义的构造函数意味着将来可以将他的实例标识为一种特定的类型；
+>
 
 
 
