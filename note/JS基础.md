@@ -387,7 +387,7 @@ console.log(year.value);
 
 > 工厂模式抽象了具体创建对象的过程，考虑到ES中无法创建类，开发人员就发明了一i中函数
 
-- 工厂模式
+##### 工厂模式
 
 ```js
 function createPerson(name,age,job){
@@ -404,7 +404,7 @@ function createPerson(name,age,job){
 
 > 工厂模式虽然解决了创建多个相似对象的问题，但是没有解决对象识别的问题，无法知道一个对象的类型；
 
-- 构造函数模式
+##### 构造函数模式
 
 > ES中的构造函数能船舰特定类型的对象；
 >
@@ -439,6 +439,96 @@ console.log(newPerson instanceof Person);	//true
 
 > 创建自定义的构造函数意味着将来可以将他的实例标识为一种特定的类型；
 >
+> 构造函数虽然好用，但是也不是没有缺点。
+>
+> 主要问题是：每个方法都要再实例上重新创建一遍；
+>
+> 不同实例创建相同函数名的函数，会导致不同的作用域链和标识符解析。
+>
+> 创建相同的Function实例完全没有必要，况且有this对象在根本不用在执行代码前九八函数绑定到特定的对象上面；
+
+```js
+//优化方法
+function Person(name,age){
+    this.name=name;
+    this.age=age;
+    
+    this.sayName=sayName;
+}
+
+function sayName(){
+    console.log(this.name);
+}
+```
+
+> 构造函数内部将sayName属性设置成全局的sayName函数。
+>
+> 新的问题：虽然方法定义在全局作用域，但实际上只能被某个对象调用，让全局作用域名不副实；
+>
+> 更进一步，如果一个对象需要定义很多方法，则需要定义多个全局函数，失去封装性；
+
+##### 原型模式
+
+> 我们创建的每个函数都有一个prototype属性，这个属性是一个指针，指向一个对象。
+>
+> Prototype就是通过调用构造函数而创建的那个对象实例的原型对象；
+>
+> 使用原型对象的好处是可以让所有对象实例共享它所包含的属性和方法，即不用再构造函数中定义对象实例的信息，而是将这些信息直接添加到原型对象中；
+
+```js
+function Person(){
+    
+}
+
+Person.prototype.name="Martin";
+Person.prototype.age=23;
+Person.prototype.sayName=function(){
+    console.log(this.name);
+};
+
+var person1=new Person();
+var person2=new Person();
+person1.name="Martin"
+person2.name="Jack"
+person1.sayName();   //"Martin"
+person2.sayName();	//"Jack"
+
+console.log(person1.sayName()==person2.sayName())	//true
+```
+
+##### 理解原型对象
+
+> 无论什么时候，只要创建了新韩淑，会为这个函数创建一个prototype属性，这个属性指向函数的原型对象。
+>
+> 默认情况下，所有原型对象都会自动获得一个constructor属性，这个属性包含一个指向prototype属性所在函数的指针。
+>
+> 举前面的例子：
+>
+> Person.prototype.constructor指向Person，通过这个构造函数可以伪原型对象添加其他属性；
+
+![](https://s3.bmp.ovh/imgs/2023/03/08/953a324fdcd4fa42.png)
+
+> 当为对象实例添加一个属性时，属性会屏蔽原型对象中保存的同名属性；
+>
+> 原型对象中的属性值不变；只会修改实例中的属性；
+>
+> 使用delete操作符可以完全删除实例属性，达到访问原型属性值的目的；
+>
+> 使用hasOwnProperty()来检查属性值是来自于原型还是实例；
+
+![](https://s3.bmp.ovh/imgs/2023/03/08/b6a6f03230b36450.png)
+
+##### 原型与in操作符
+
+
+
+
+
+
+
+
+
+
 
 
 
