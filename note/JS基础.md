@@ -520,6 +520,313 @@ console.log(person1.sayName()==person2.sayName())	//true
 
 ##### 原型与in操作符
 
+> 有两种方式使用in操作符：单独使用和for-in循环使用；
+>
+> 单独使用：通过对象能返回给定属性时返回true（不论原型和实例）；hasOwnProperty()只适用于实例；
+>
+> tips:如果in返回true而hasOwnProperty()返回false，可以确定属性是原型中的属性；
+>
+> for-in中使用：返回的是通过对象访问的，可以枚举的属性；
+
+```js
+//获得对象上所有的可枚举实例
+object.keys();
+
+var p=new Person();
+var pKeys=Obcject.keys(p);
+```
+
+##### 更简单的原型语法
+
+```js
+//简写prototype
+function Person(){}
+
+Person.prototype={
+    name:"Martin",
+    age:29,
+    job:"Software Engineer",
+    sayName:function(){
+        alert(this.name);
+    }
+};
+
+//上面的代码里，将Person.prototype设置为一个字面量创建的新对象；但是此时constructor不再指向Person了；
+//每创建一个函数，同时会创建他的prototype对象，这个对象自动获得constructor属性；
+Person.prototype={
+    constructor:Person,
+    name:"Martin",
+    age:29,
+    job:"Software Engineer",
+    sayName:function(){
+        alert(this.name);
+    }
+};
+```
+
+##### 组合使用：构造函数模式和原型模式
+
+> 构造函数用于定义实例属性；原型模式用于定义方法和共享属性；
+>
+> 共享方法，但是每个实例有自己的属性副本；
+
+```js
+function Person(name, age, job){ 
+ this.name = name; 
+ this.age = age; 
+ this.job = job; 
+ this.friends = ["Shelby", "Court"]; 
+} 
+Person.prototype = { 
+ constructor : Person, 
+ sayName : function(){ 
+ alert(this.name); 
+ } 
+} 
+```
+
+##### 动态原型模式
+
+> 通过将所有信息封装到构造函数，再构造函数中初始化原型；
+
+```js
+function Person(name, age, job){ 
+ this.name = name; 
+ this.age = age; 
+ this.job = job; 
+    if(typeof this.sayName!="function"){
+        Person.prototype.sayName=function(){
+            alert(this.name);
+        }
+    }
+} 
+```
+
+##### 寄生构造函数
+
+```js
+function Person(name, age, job){ 
+ var o = new Object(); 
+ o.name = name; 
+ o.age = age; 
+ o.job = job; 
+ o.sayName = function(){ 
+ alert(this.name); 
+ }; 
+ return o; 
+} 
+var friend = new Person("Nicholas", 29, "Software Engineer"); 
+friend.sayName(); //"Nicholas" 
+```
+
+### 3.继承
+
+- 接口继承：只继承方法签名；
+- 实现继承：继承实际方法；
+
+ES只支持实现继承，主要依靠原型链实现；
+
+#### （1）原型链
+
+> 利用原型让一个引用类型继承另一个引用类型的属性和方法；
+
+```js
+//原型链基本模式
+
+function SuperType(){
+    this.property=true;
+}
+
+SuperType.prototype.getSuperValue=function(){
+    return this.property;
+};
+
+function SubType(){
+    this.subproperty=false;
+}
+
+SubType.prototype=new SuperType();		//子类的原型是父类的实例；子类获得父类的所有属性和方法；
+
+SubType.prototype.getSubValue=function(){
+    return this.subproperty;
+};
+
+var instacne=new SubType();
+console.log(instacne.getSuperValue());		//true;
+```
+
+![](https://s3.bmp.ovh/imgs/2023/03/11/606aeed6b87048a8.png)
+
+- 别忘记默认的原型
+
+> 所有引用类型都默认继承Object；
+
+![](https://s3.bmp.ovh/imgs/2023/03/11/ccdc684bf208d6d1.png)
+
+- 确定原型和实例的关系
+
+```js
+instance instanceof Object;
+Objcet.prototype.isPrototypeOf(instance);
+```
+
+- 谨慎的定义代码
+
+> 子类优势需要重写超类中的某个方法，或者添加超累不存在的某个方法；
+>
+> 不管怎样，给原型添加的代码一定要放在替换原型语句之后；
+
+```js
+function SuperType(){ 
+ this.property = true; 
+} 
+SuperType.prototype.getSuperValue = function(){ 
+ return this.property; 
+}; 
+function SubType(){ 
+ this.subproperty = false; 
+} 
+
+//继承了 SuperType 
+SubType.prototype = new SuperType(); 
+//!!!!添加新方法
+SubType.prototype.getSubValue = function (){ 
+ return this.subproperty; 
+}; 
+//重写超类型中的方法
+SubType.prototype.getSuperValue = function (){ 
+ return false; 
+}; 
+var instance = new SubType(); 
+alert(instance.getSuperValue()); //false 
+
+```
+
+##### Notice!!!
+
+使用原型链实现继承时，不能使用对象字面量创建原型方法；因为会重写原型链；
+
+```js
+function SuperType(){ 
+ this.property = true; 
+} 
+SuperType.prototype.getSuperValue = function(){ 
+ return this.property; 
+}; 
+function SubType(){ 
+ this.subproperty = false; 
+} 
+//继承了 SuperType 
+SubType.prototype = new SuperType(); 
+//使用字面量添加新方法，会导致上一行代码无效
+SubType.prototype = { 
+ getSubValue : function (){ 
+ return this.subproperty; 
+ }, 
+ someOtherMethod : function (){ 
+ return false; 
+ } 
+}; 
+var instance = new SubType(); 
+alert(instance.getSuperValue()); //error! 
+```
+
+- 原型链的问题
+
+> 问题来自于包含引用类型值的原型；
+>
+> 包含引用类型值的原型属性会被所有实例共享，这也是在构造函数而不是在原型对象中定义属性的原因；
+>
+> 在通过原型来实现继承时，原型实际上会变成另一个类型的实例；于是原先实例的属性也就变成了现在的原型属性了；
+
+```js
+//定义了一个colors属性
+function SuperType(){
+    this.colors=['red','grenn']l
+}
+
+function SubType(){
+    
+}
+
+//子类原型设为父类
+SubType.protptype=new SuperType();
+var instance1=new SubType();
+//所有的子都会共享colors；
+instance1.colors.push('black');
+alert(instance1.colors);			//red\gren\black
+
+var instance2=new SubType();
+alert(instance2.colors);			//red\green\black
+```
+
+#### （2）借用构造函数
+
+> 伪造对象或者经典继承；
+>
+> 在子类构造函数的内部调用超类型构造函数；
+
+```js
+//定义了一个colors属性
+function SuperType(){
+    this.colors=['red','grenn']l
+}
+
+function SubType(){
+    SuperType.call(this);	//继承了supertype；实际上在未来新创建的SubType实例时调用SuperType的构造函数；
+}
+
+var ins=new SubType();
+ins.colors.push("black");
+console.log(ins.colors);	//red.green.black;
+var ins2=new SubType();
+console.log(ins2.colors);	//red.green;	//不会共享colors了；
+
+```
+
+##### 传递参数
+
+> 相比于原型链，借用构造函数有一个很大的优势，可以在子类型构造函数中向超累型构造函数传递参数；
+
+```js
+//定义了一个colors属性
+function SuperType(){
+    this.name=name;
+}
+
+function SubType(){
+    SuperType.call(this,"Martin");		//调用父类构造函数实际上为子类的实例设置了name属性；
+    this.age=29;		//为了确保父类构造函数不会重写子类的属性，可以在调用父类构造函数忠厚添加子类定义的属性；
+}
+
+var ins=new SubType();
+console.log(ins.name);		//Martin
+console.log(ins.age);		//29
+
+```
+
+##### 问题
+
+> 仅仅借用构造函数，无法避免构造函数模式存在的问题：方法都在构造函数中定义，无法函数复用；
+>
+> 超类原型定义的方法对子类而言也是不可见得；
+
+#### （3）组合继承
+
+> 组合继承：有时叫伪经典继承，指将原型链和借用构造函数的技术组合到一块儿，发挥二者之长的继承模式；
+>
+> 背后的思路是使用原型链实现对原型属性和方法的继承，通过借用构造函数来实现对实例属性的继承；
+
+
+
+
+
+
+
+
+
+
+
 
 
 
