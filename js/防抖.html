@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    body {
+      height: 2000px;
+    }
+  </style>
+</head>
+
+<body>
+  <input type="text">
+  <span id="value"></span>
+
+  <script>
+    let inputEvent = document.querySelector('input')
+    let content = document.getElementById('value')
+
+    function inputChange () {
+      console.log(this.value)
+      content.innerHTML = inputEvent.value
+    }
+
+    function alertAdv () {
+      alert("广告")
+    }
+
+    window.onscroll = ttrottle(alertAdv, 1000)
+
+    function ttrottle (fn, delay) {
+      let timer = true
+      return function () {
+        if (timer) {
+          setTimeout(() => {
+            fn.call(this)
+            timer = true
+          }, delay)
+        }
+        timer = false
+      }
+    }
+
+    //使用闭包形成防抖
+    //闭包：函数里有一个内部函数，并返回出去，还是用了外部函数的变量
+    inputEvent.oninput = debounce(inputChange, 1000)
+    function debounce (func, delay) {
+      let timer = null
+      return function () {
+        //如果定时器不空，则清除之前的timer
+        if (timer !== null) {
+          clearTimeout(timer)
+        }
+        timer = setTimeout(() => {
+          func.call(this)
+        }, delay)
+      }
+    }
+
+  </script>
+</body>
+
+</html>
