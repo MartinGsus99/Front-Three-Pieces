@@ -1,0 +1,39 @@
+.form-item {
+  width: 300px;
+  padding-top: 300px;
+  margin: 0 auto;
+  border: 0;
+  position: relative;
+}
+
+.form-item input {
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+.form-item .label {
+  position: absolute;
+  left: -50%;
+}
+
+.form-item .bar {
+  position: absolute;
+  width: 20px;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%, +50%);
+  background: #161924;
+  transition: 0.4s ease;
+}
+
+.form-item input:focus ~ .bar {
+  width: 100%;
+}
+
+.form-item input:valid ~ label {
+  color: #5264ae;
+  transform: translateY(-40px);
+  font-size: 16px;
+}

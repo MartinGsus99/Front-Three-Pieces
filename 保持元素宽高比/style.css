@@ -1,0 +1,20 @@
+.item {
+  background: #f40;
+  width: 50%;
+  margin: 0 auto;
+  /* 新方法，兼容性差 */
+  aspect-ratio: 4/3;
+}
+
+/* 老方法需要两个容器 */
+.container {
+  background: rgb(115, 71, 211);
+  width: 50%;
+  margin: 0 auto;
+}
+
+.inner {
+  width: 100%;
+  padding-bottom: 75%;
+  position: relative;
+}
